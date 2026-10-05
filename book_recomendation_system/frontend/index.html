@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookWise - Simple & Smart Book Recommendation System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo" onclick="switchTab('popular')">
+        <div class="logo-icon"><i class="fa-solid fa-book-open"></i></div>
+        <div class="logo-text">
+          <span class="brand-title">BookWise</span>
+          <span class="brand-subtitle">Recommendation System</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button id="nav-popular-btn" class="nav-tab active" onclick="switchTab('popular')">
+          <i class="fa-solid fa-fire"></i> Top 50 Popular
+        </button>
+        <button id="nav-recommend-btn" class="nav-tab" onclick="switchTab('recommend')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div id="backend-status-badge" class="status-badge checking" title="Checking backend connection status">
+          <span class="status-dot"></span>
+          <span id="backend-status-text">Connecting...</span>
+        </div>
+        <button class="settings-btn" id="api-settings-btn" title="Backend Server Settings">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container main-content">
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="badge-pill">
+        <i class="fa-solid fa-sparkles"></i> Machine Learning Recommender
+      </div>
+      <h1 class="hero-title">
+        Discover Books You'll <span class="text-highlight">Love to Read</span>
+      </h1>
+      <p class="hero-desc">
+        Search for your favorite book to receive 5 tailored recommendations, or browse the top 50 popular books.
+      </p>
+
+      <!-- Search Box -->
+      <div class="search-wrapper">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input
+            type="text"
+            id="book-search-input"
+            placeholder="Type a book title (e.g. 1984, The Hobbit, The Da Vinci Code...)"
+            autocomplete="off"
+          />
+          <button id="clear-search-btn" class="clear-btn hidden" title="Clear input">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+          <button id="search-btn" class="btn-primary" onclick="handleSearch()">
+            <span>Recommend</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Live Autocomplete Suggestions Dropdown -->
+        <ul id="suggestions-list" class="suggestions-list hidden"></ul>
+      </div>
+
+      <!-- Quick Pick Suggested Tags -->
+      <div class="quick-tags">
+        <span class="quick-tags-label"><i class="fa-regular fa-lightbulb"></i> Try clicking:</span>
+        <div class="tags-container" id="sample-tags">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Error / Info Banner -->
+    <div id="alert-banner" class="alert-banner hidden">
+      <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+      <div class="alert-message" id="alert-message-text"></div>
+      <button class="alert-close" onclick="hideAlert()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- TAB 1: RECOMMENDATIONS SECTION -->
+    <section id="recommend-section" class="tab-view">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Recommended Books</h2>
+          <p class="section-subtitle" id="recommend-subtitle">
+            Search for any book above or click on one from the popular list to get recommendations.
+          </p>
+        </div>
+      </div>
+
+      <!-- Recommendation Results Grid -->
+      <div id="recommend-grid" class="books-grid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Empty State for Recommendations -->
+      <div id="recommend-empty-state" class="empty-state">
+        <div class="empty-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+        <h3>No recommendations yet</h3>
+        <p>Type a book name in the search bar above or choose a sample book below.</p>
+        <button class="btn-secondary" onclick="searchSampleBook('The Da Vinci Code')">
+          <i class="fa-solid fa-magnifying-glass"></i> Try "The Da Vinci Code"
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: POPULAR BOOKS SECTION -->
+    <section id="popular-section" class="tab-view active">
+      <div class="section-header">
+        <div>
+          <div class="section-badge"><i class="fa-solid fa-trophy"></i> Top 50 Chart</div>
+          <h2 class="section-title">Popular Books</h2>
+          <p class="section-subtitle">
+            Top rated books most frequently recommended across readers.
+          </p>
+        </div>
+        <div class="filter-wrapper">
+          <div class="filter-box">
+            <i class="fa-solid fa-filter"></i>
+            <input
+              type="text"
+              id="popular-filter-input"
+              placeholder="Filter list..."
+              oninput="filterPopularBooks(this.value)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Popular Books Grid -->
+      <div id="popular-grid" class="books-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for API Configuration -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeSettingsModal()"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-sliders"></i> Backend Connection Settings
+        </div>
+        <button class="modal-close-btn" onclick="closeSettingsModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label for="api-url-input">FastAPI Backend URL</label>
+        <input
+          type="text"
+          id="api-url-input"
+          value="http://127.0.0.1:8000"
+          placeholder="http://127.0.0.1:8000"
+        />
+        <p class="input-help">
+          Make sure backend is running with:
+          <code>uvicorn backend.main:app --reload</code>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveApiUrl()">Save & Reconnect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>© 2026 <strong>BookWise</strong> • Simple Book Recommendation System</p>
+      <div class="footer-links">
+        <span><i class="fa-solid fa-circle-check"></i> FastAPI Connected</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

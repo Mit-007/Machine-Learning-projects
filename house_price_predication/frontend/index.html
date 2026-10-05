@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Prediction System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background Glows -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-badge">
+                <i class="fa-solid fa-house-chimney"></i>
+                <span>RealEstate AI</span>
+            </div>
+            <h1>House Price Prediction</h1>
+            <p class="subtitle">Estimate your dream property's market value instantly using our Machine Learning model</p>
+            
+            <!-- Backend API Status Indicator -->
+            <div class="api-status-badge" id="apiStatusBadge">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Checking Backend API...</span>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-layout">
+            <!-- Left / Main Card: Prediction Form -->
+            <div class="card form-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa-solid fa-sliders"></i>
+                        <h2>Property Details</h2>
+                    </div>
+                    <button type="button" class="btn-ghost" id="sampleDataBtn" title="Fill with sample values">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Sample Data</span>
+                    </button>
+                </div>
+
+                <form id="predictionForm" novalidate>
+                    <!-- Field 1: Location -->
+                    <div class="form-group">
+                        <label for="location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>Location</span>
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper select-wrapper">
+                            <select id="location" name="location" required>
+                                <option value="" disabled selected>Choose property location...</option>
+                                <!-- Populated dynamically by app.js -->
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
+                        <small class="field-hint">Select the locality or area where the property is situated</small>
+                    </div>
+
+                    <!-- Field 2: Total Square Feet -->
+                    <div class="form-group">
+                        <label for="total_sqft">
+                            <i class="fa-solid fa-ruler-combined"></i>
+                            <span>Total Area (Sq. Ft.)</span>
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="number" 
+                                id="total_sqft" 
+                                name="total_sqft" 
+                                placeholder="e.g. 1200" 
+                                min="100" 
+                                max="50000" 
+                                step="any"
+                                required
+                            >
+                            <span class="input-unit">sq.ft</span>
+                        </div>
+                        <!-- Quick presets for sqft -->
+                        <div class="preset-chips">
+                            <span class="preset-label">Quick select:</span>
+                            <button type="button" class="chip" data-target="total_sqft" data-val="650">650 sq ft</button>
+                            <button type="button" class="chip" data-target="total_sqft" data-val="1000">1,000 sq ft</button>
+                            <button type="button" class="chip" data-target="total_sqft" data-val="1250">1,250 sq ft</button>
+                            <button type="button" class="chip" data-target="total_sqft" data-val="1800">1,800 sq ft</button>
+                        </div>
+                    </div>
+
+                    <!-- Two-column grid for BHK & Bathrooms -->
+                    <div class="form-row">
+                        <!-- Field 3: BHK -->
+                        <div class="form-group col-half">
+                            <label for="bhk">
+                                <i class="fa-solid fa-bed"></i>
+                                <span>Bedrooms (BHK)</span>
+                                <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="bhk" 
+                                    name="bhk" 
+                                    placeholder="e.g. 2" 
+                                    min="1" 
+                                    max="16" 
+                                    step="1"
+                                    required
+                                >
+                            </div>
+                            <div class="preset-chips">
+                                <button type="button" class="chip bhk-chip" data-target="bhk" data-val="1">1 BHK</button>
+                                <button type="button" class="chip bhk-chip" data-target="bhk" data-val="2">2 BHK</button>
+                                <button type="button" class="chip bhk-chip" data-target="bhk" data-val="3">3 BHK</button>
+                                <button type="button" class="chip bhk-chip" data-target="bhk" data-val="4">4 BHK</button>
+                            </div>
+                        </div>
+
+                        <!-- Field 4: Bathrooms -->
+                        <div class="form-group col-half">
+                            <label for="bath">
+                                <i class="fa-solid fa-bath"></i>
+                                <span>Bathrooms</span>
+                                <span class="required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="bath" 
+                                    name="bath" 
+                                    placeholder="e.g. 2" 
+                                    min="1" 
+                                    max="16" 
+                                    step="1"
+                                    required
+                                >
+                            </div>
+                            <div class="preset-chips">
+                                <button type="button" class="chip bath-chip" data-target="bath" data-val="1">1 Bath</button>
+                                <button type="button" class="chip bath-chip" data-target="bath" data-val="2">2 Bath</button>
+                                <button type="button" class="chip bath-chip" data-target="bath" data-val="3">3 Bath</button>
+                                <button type="button" class="chip bath-chip" data-target="bath" data-val="4">4 Bath</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="predictBtn">
+                            <span class="btn-text">
+                                <i class="fa-solid fa-calculator"></i>
+                                <span>Predict House Price</span>
+                            </span>
+                            <span class="spinner" id="btnSpinner"></span>
+                        </button>
+                        <button type="button" class="btn btn-outline" id="resetBtn">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Error Message Banner -->
+                <div class="alert alert-danger" id="errorAlert" style="display: none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div class="alert-content">
+                        <strong id="errorTitle">Prediction Failed</strong>
+                        <p id="errorMessage">Unable to connect to backend server.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Result / Status Card -->
+            <div class="card result-card" id="resultCard">
+                <!-- Initial Empty State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon-box">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3>Ready for Prediction</h3>
+                    <p>Enter the property specifications and click <strong>Predict House Price</strong> to see the ML estimated valuation.</p>
+                    
+                    <div class="feature-pills">
+                        <div class="pill"><i class="fa-solid fa-bolt"></i> Ridge Regression Model</div>
+                        <div class="pill"><i class="fa-solid fa-shield-halved"></i> Fast & Accurate</div>
+                        <div class="pill"><i class="fa-solid fa-city"></i> 20+ Top Localities</div>
+                    </div>
+                </div>
+
+                <!-- Prediction Loading State -->
+                <div class="loading-state" id="loadingState" style="display: none;">
+                    <div class="pulse-loader"></div>
+                    <p>Computing estimated value with ML model...</p>
+                </div>
+
+                <!-- Prediction Success State -->
+                <div class="success-state" id="successState" style="display: none;">
+                    <div class="success-header">
+                        <span class="badge-tag">Estimated Valuation</span>
+                        <span class="timestamp" id="resultTimestamp">Just now</span>
+                    </div>
+
+                    <div class="price-display-wrapper">
+                        <span class="currency-symbol">₹</span>
+                        <h2 class="price-value" id="predictedPrice">--</h2>
+                        <span class="price-unit" id="priceUnit">Lakhs</span>
+                    </div>
+                    <p class="price-in-words" id="priceInWords">Estimated Value in Indian Rupees</p>
+
+                    <div class="metrics-grid">
+                        <div class="metric-box">
+                            <span class="metric-label">Rate / Sq.Ft</span>
+                            <span class="metric-value" id="ratePerSqft">--</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-label">Configuration</span>
+                            <span class="metric-value" id="summaryBhk">--</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4>Property Summary</h4>
+                        <div class="summary-row">
+                            <span class="label"><i class="fa-solid fa-location-dot"></i> Location:</span>
+                            <strong class="value" id="summaryLocation">--</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label"><i class="fa-solid fa-ruler-combined"></i> Built-up Area:</span>
+                            <strong class="value" id="summarySqft">--</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label"><i class="fa-solid fa-bath"></i> Bathrooms:</span>
+                            <strong class="value" id="summaryBath">--</strong>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary btn-full" id="newPredictionBtn">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Calculate Another Property</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>House Price Prediction System • Powered by FastAPI & Scikit-Learn</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
